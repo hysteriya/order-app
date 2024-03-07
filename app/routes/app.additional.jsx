@@ -1,82 +1,96 @@
+import { Form, json, useLoaderData } from "@remix-run/react";
 import {
   Box,
   Card,
-  Layout,
-  Link,
-  List,
   Page,
   Text,
   BlockStack,
+  useBreakpoints,
+  InlineGrid,
+  TextField,
+  Divider,
+  Button,
 } from "@shopify/polaris";
+import { useState } from "react";
 
-export default function AdditionalPage() {
+export async function loader() {
+  let data = {
+    name: "xyz",
+    add: "xyz street",
+    company: "xyz",
+    title: "xyz"
+  }
+  return json(data);
+}
+
+export async function action({ request }) {
+  let data = await request.formData();
+  data = Object.fromEntries(data);
+  return json(data);
+}
+
+
+export default function AppSettingsLayoutExample() {
+  const { smUp } = useBreakpoints();
+  const data = useLoaderData();
+
+
+  const [form, setForm] = useState(data);
   return (
     <Page>
-      <ui-title-bar title="Additional page" />
-      <Layout>
-        <Layout.Section>
-          <Card>
-            <BlockStack gap="300">
-              <Text as="p" variant="bodyMd">
-                The app template comes with an additional page which
-                demonstrates how to create multiple pages within app navigation
-                using{" "}
-                <Link
-                  url="https://shopify.dev/docs/apps/tools/app-bridge"
-                  target="_blank"
-                  removeUnderline
-                >
-                  App Bridge
-                </Link>
-                .
-              </Text>
-              <Text as="p" variant="bodyMd">
-                To create your own page and have it show up in the app
-                navigation, add a page inside <Code>app/routes</Code>, and a
-                link to it in the <Code>&lt;ui-nav-menu&gt;</Code> component
-                found in <Code>app/routes/app.jsx</Code>.
-              </Text>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-        <Layout.Section variant="oneThird">
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h2" variant="headingMd">
-                Resources
-              </Text>
-              <List>
-                <List.Item>
-                  <Link
-                    url="https://shopify.dev/docs/apps/design-guidelines/navigation#app-nav"
-                    target="_blank"
-                    removeUnderline
-                  >
-                    App nav best practices
-                  </Link>
-                </List.Item>
-              </List>
-            </BlockStack>
-          </Card>
-        </Layout.Section>
-      </Layout>
+      <Form method="POST">
+        <BlockStack gap={{ xs: "800", sm: "400" }}>
+          <InlineGrid columns={{ xs: "1fr", md: "2fr 5fr" }} gap="400">
+            <Box
+              as="section"
+              paddingInlineStart={{ xs: 400, sm: 0 }}
+              paddingInlineEnd={{ xs: 400, sm: 0 }}
+            >
+              <BlockStack gap="400">
+                <Text as="h3" variant="headingMd">
+                  Personal Information
+                </Text>
+                <Text as="p" variant="bodyMd">
+                  Please provide your personal information.
+                </Text>
+              </BlockStack>
+            </Box>
+            <Card roundedAbove="sm">
+              <BlockStack gap="400">
+                <TextField label="Name" name="name" value={form.name} onChange={(value) => setForm({ ...form, name: value })} />
+                <TextField label="Address" name="add" value={form.add} onChange={(value) => setForm({ ...form, add: value })} />
+              </BlockStack>
+            </Card>
+          </InlineGrid>
+          {smUp ? <Divider /> : null}
+          <InlineGrid columns={{ xs: "1fr", md: "2fr 5fr" }} gap="400">
+            <Box
+              as="section"
+              paddingInlineStart={{ xs: 400, sm: 0 }}
+              paddingInlineEnd={{ xs: 400, sm: 0 }}
+            >
+              <BlockStack gap="400">
+                <Text as="h3" variant="headingMd">
+                  Professional Information
+                </Text>
+                <Text as="p" variant="bodyMd">
+                  Please provide your professional information.
+                </Text>
+              </BlockStack>
+            </Box>
+            <Card roundedAbove="sm">
+              <BlockStack gap="400">
+                <TextField label="Company" name="company" value={form.company} onChange={(value) => setForm({ ...form, company: value })} />
+                <TextField label="Title" name="title" value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
+              </BlockStack>
+            </Card>
+            <br />
+            <Button submit={true}>Save</Button>
+          </InlineGrid>
+        </BlockStack>
+      </Form>
     </Page>
-  );
+  )
 }
 
-function Code({ children }) {
-  return (
-    <Box
-      as="span"
-      padding="025"
-      paddingInlineStart="100"
-      paddingInlineEnd="100"
-      background="bg-surface-active"
-      borderWidth="025"
-      borderColor="border"
-      borderRadius="100"
-    >
-      <code>{children}</code>
-    </Box>
-  );
-}
+
