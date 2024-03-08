@@ -12,20 +12,37 @@ import {
   Button,
 } from "@shopify/polaris";
 import { useState } from "react";
+import db from '../db.server';
 
 export async function loader() {
-  let data = {
-    name: "xyz",
-    add: "xyz street",
-    company: "xyz",
-    title: "xyz"
-  }
+  let data = await db.data.findFirst();
+  console.log('data', data);
   return json(data);
 }
 
 export async function action({ request }) {
   let data = await request.formData();
   data = Object.fromEntries(data);
+  await db.data.upsert({
+    where: {
+      id: '1',
+    }, // get the first record
+    update:{
+      id: '1',
+      name: data.name,
+      add:  data.add,
+      company: data.company,
+      title: data.title
+    },
+    create: {
+      id: '1',
+      name: data.name,
+      add:  data.add,
+      company: data.company,
+      title: data.title
+    }
+  })
+
   return json(data);
 }
 
@@ -57,8 +74,8 @@ export default function AppSettingsLayoutExample() {
             </Box>
             <Card roundedAbove="sm">
               <BlockStack gap="400">
-                <TextField label="Name" name="name" value={form.name} onChange={(value) => setForm({ ...form, name: value })} />
-                <TextField label="Address" name="add" value={form.add} onChange={(value) => setForm({ ...form, add: value })} />
+                <TextField label="Name" name="name" value={form?.name} onChange={(value) => setForm({ ...form, name: value })} />
+                <TextField label="Address" name="add" value={form?.add} onChange={(value) => setForm({ ...form, add: value })} />
               </BlockStack>
             </Card>
           </InlineGrid>
@@ -80,8 +97,8 @@ export default function AppSettingsLayoutExample() {
             </Box>
             <Card roundedAbove="sm">
               <BlockStack gap="400">
-                <TextField label="Company" name="company" value={form.company} onChange={(value) => setForm({ ...form, company: value })} />
-                <TextField label="Title" name="title" value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
+                <TextField label="Company" name="company" value={form?.company} onChange={(value) => setForm({ ...form, company: value })} />
+                <TextField label="Title" name="title" value={form?.title} onChange={(value) => setForm({ ...form, title: value })} />
               </BlockStack>
             </Card>
             <br />

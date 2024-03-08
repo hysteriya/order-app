@@ -20,3 +20,13 @@ model Session {
   accessToken String
   userId      BigInt?
 }
+
+model Data {
+  id          String    @id
+  name        String
+  add         String?
+  company     String?
+  title       String?
+}
+
+
